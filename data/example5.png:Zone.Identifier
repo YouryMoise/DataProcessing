@@ -1,0 +1,3 @@
+[ZoneTransfer]
+ZoneId=3
+HostUrl=https://us-east.storage.cloudconvert.com/tasks/0ddb2bf4-b2ca-4aca-81d0-34089a1c8976/MNIST_6_0.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20260907%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20260907T062108Z&X-Amz-Expires=86400&X-Amz-Signature=2744c70804bec173ffe67ab0a84bb70b9661877e27d10625ab79c629920a436b&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22MNIST_6_0.png%22&response-content-type=image%2Fpng&x-amz-checksum-mode=ENABLED&x-id=GetObject

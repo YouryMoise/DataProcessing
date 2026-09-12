@@ -1,0 +1,3 @@
+[ZoneTransfer]
+ZoneId=3
+HostUrl=https://us-east.storage.cloudconvert.com/tasks/7aa61aec-1d95-47b8-9551-a83b7459da9c/temp.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20260911%2Fva%2Fs3%2Faws4_request&X-Amz-Date=20260911T024305Z&X-Amz-Expires=86400&X-Amz-Signature=8035a5736456ab68135238da21ea65ce83ee0c1bc846d2529dbc8908940e8186&X-Amz-SignedHeaders=host&response-content-disposition=attachment%3B%20filename%3D%22temp.png%22&response-content-type=image%2Fpng&x-amz-checksum-mode=ENABLED&x-id=GetObject
