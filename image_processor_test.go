@@ -203,7 +203,7 @@ func TestDCTU_Non0_V_Non0(t *testing.T) {
 }
 
 func TestPerceptualHashIdentical(t *testing.T) {
-ip := &ImageProcessor{}
+	ip := &ImageProcessor{}
 	img1 := loadImage("data/example5.png")
 	img2 := imaging.Clone(img1)
 		
@@ -303,18 +303,157 @@ func TestPerceptualHashRotated(t *testing.T) {
 
 }
 
-func TestORBIdentical(t *testing.T) {
+func TestCheckConsecutiveFrom0(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{true,true,true,true,true,true,true,true,true,true,true,true,false,false,false,false}
+	c := ip.checkConsecutive(values, n)
+	if !c {
+		t.Errorf("Did not find consecutive run")
+	}
+}
 
+func TestCheckConsecutiveFromNon0NoWrap(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{false,true,true,true,true,true,true,true,true,true,true,true,true,false,false,false}
+	c := ip.checkConsecutive(values, n)
+	if !c {
+		t.Errorf("Did not find consecutive run")
+	}
+}
+
+func TestCheckConsecutiveFromNon0WithGap(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{false,true,true,true,true,true,true,true,true,true,true,true,false,true,false,false}
+	c := ip.checkConsecutive(values, n)
+	if c {
+		t.Errorf("Found consecutive run when there was none")
+	}
+}
+
+func TestCheckConsecutiveWrapStartAtEnd(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{true,true,true,true,true,true,true,true,true,true,true,false,false,false,false,true}
+	c := ip.checkConsecutive(values, n)
+	if !c {
+		t.Errorf("Did not find consecutive run")
+	}
+}
+
+func TestCheckConsecutiveWrapStartBeforeEnd(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{true,true,true,true,true,true,true,true,false,false,false,false,true,true,true,true}
+	c := ip.checkConsecutive(values, n)
+	if !c {
+		t.Errorf("Did not find consecutive run")
+	}
+}
+
+func TestCheckConsecutiveWrapStartBeforeEndWithGap(t *testing.T) {
+	ip := &ImageProcessor{}
+	var n uint32 = 12
+	values := [16]bool{false,true,true,true,true,true,true,true,false,false,false,false,true,true,true,true}
+	c := ip.checkConsecutive(values, n)
+	if c {
+		t.Errorf("Found consecutive run when there was none")
+	}
+}
+
+func TestORBIdentical(t *testing.T) {
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	img2 := imaging.Clone(img1)
+		
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if !equal  {
+		t.Errorf("Images were not found equal, match count %v <= 15\n", score)
+	}
 }
 
 func TestORBNonIdentical(t *testing.T) {
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	img2 := loadImage("data/example7.png")
+		
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if equal  {
+		t.Errorf("Images were found equal, match count %v >= 15\n", score)
+	}
+}
+
+func TestORBDoubleSize(t *testing.T) {
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	b := img1.Bounds()
+	width := b.Max.X
+	height := b.Max.Y
+
+	img2 := imaging.Resize(img1, width*2, height*2, imaging.Lanczos)
+	
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if !equal  {
+		t.Errorf("Images were not found equal, match count %v <= 15\n", score)
+	}
+	// t.Errorf("l")
+
+
+}
+
+
+func TestORBBrightness(t *testing.T) {
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	img2 := imaging.AdjustBrightness(img1, 96.65)
+
+		
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if !equal  {
+		t.Errorf("Images were not found equal, match count %v <= 15\n", score)
+	}
 
 }
 
 func TestORBRotated(t *testing.T) {
-
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	img2 := imaging.Rotate(img1, 180, color.Black) // degrees
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if !equal  {
+		t.Errorf("Images were not found equal, match count < %v\n", score)
+	}
 }
 
 func TestORBCropped(t *testing.T) {
+	ip := &ImageProcessor{}
+	img1 := loadImage("data/example5.png")
+	b := img1.Bounds()
+	width := b.Max.X
+	height := b.Max.Y
 
+	croppedTopMargin := int(float64(width)*0.46) // best it can find
+	croppedSideMargin := int(float64(height)*0.46) // best it can find
+	
+	cropRect := image.Rect(croppedSideMargin, croppedTopMargin, width-croppedSideMargin, height-croppedTopMargin)
+	img2 := imaging.Crop(img1, cropRect)
+		
+	mask1, _ := ip.dedupORB(img1)
+	mask2, _ := ip.dedupORB(img2)
+	equal, score := ip.compareORBDescs(mask1, mask2)
+	if !equal {
+		t.Errorf("Images were not found equal, match count < %v\n", score)
+	}
 }

@@ -6,7 +6,11 @@ import (
 
 )
 
+// TODO
+/*
+change masks used in hamming distance to be actual bits instead of arrays of bools
 
+*/
 func loadImage(filepath string) *image.NRGBA{
 	img, err := imaging.Open(filepath)
 	if err != nil {
